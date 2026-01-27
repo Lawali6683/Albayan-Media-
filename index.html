@@ -269,21 +269,21 @@
         </form>
     </div>
 
-    <script type="module">
+  
+
+<script type="module">
 import { app } from './firebase.js';
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
-  deleteUser
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 import {
   getDatabase,
   ref,
-  set,
-  get
+  set
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const auth = getAuth(app);
@@ -296,19 +296,24 @@ const admins = [
   "nafiulawaliabubakar@gmail.com"
 ];
 
-// ================= AUTH CHECK =================
+/* ================= AUTH AUTO REDIRECT ================= */
 onAuthStateChanged(auth, (user) => {
   if (!user) return;
+
   const email = user.email.toLowerCase();
-  window.location.href = admins.includes(email)
-    ? "adminPage.html"
-    : "dashboard.html";
+  if (admins.includes(email)) {
+    window.location.href = "adminPage.html";
+  } else {
+    window.location.href = "dashboard.html";
+  }
 });
 
-// ================= UI HELPERS =================
+/* ================= UI HELPERS ================= */
 window.showForm = (type) => {
   document.getElementById('form-register').style.display = type === 'reg' ? 'block' : 'none';
   document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+  document.getElementById('tab-reg').classList.toggle('active', type === 'reg');
+  document.getElementById('tab-login').classList.toggle('active', type === 'login');
 };
 
 window.togglePass = (id) => {
@@ -316,110 +321,128 @@ window.togglePass = (id) => {
   el.type = el.type === "password" ? "text" : "password";
 };
 
-function showNotif(msg, error = false) {
+function showNotif(msg, isError = false) {
   const box = document.getElementById('notif-container');
   const icon = document.getElementById('notif-icon');
+
   document.getElementById('notif-msg').innerText = msg;
-  box.style.borderLeft = error ? "5px solid red" : "5px solid green";
-  icon.style.color = error ? "red" : "green";
+  box.style.borderLeft = isError ? "5px solid red" : "5px solid green";
+  icon.style.color = isError ? "red" : "green";
+
   box.classList.add('show');
   setTimeout(() => box.classList.remove('show'), 4000);
 }
 
-// ================= IMAGE PREVIEW =================
-document.getElementById('file-input').onchange = (e) => {
+/* ================= IMAGE PREVIEW ================= */
+document.getElementById('file-input').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
   document.getElementById('logo-preview').src = URL.createObjectURL(file);
   document.getElementById('logo-preview').style.display = 'block';
   document.getElementById('upload-icon').style.display = 'none';
-};
+});
 
-// ================= IMGUR UPLOAD =================
+/* ================= IMGUR UPLOAD ================= */
 async function uploadToImgur(file) {
-  const fd = new FormData();
-  fd.append("image", file);
+  const formData = new FormData();
+  formData.append('image', file);
 
-  const res = await fetch("https://api.imgur.com/3/image", {
-    method: "POST",
+  const res = await fetch('https://api.imgur.com/3/image', {
+    method: 'POST',
     headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
-    body: fd
+    body: formData
   });
 
   const data = await res.json();
-  if (!data.success) throw new Error("Image upload failed");
+  if (!data.success) throw new Error("Upload logo ya kasa");
+
   return data.data.link;
 }
 
-// ================= REGISTER =================
-document.getElementById('form-register').onsubmit = async (e) => {
+/* ================= REGISTER ================= */
+document.getElementById('form-register').addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const loader = document.getElementById('loader');
-  loader.style.display = "flex";
+  loader.style.display = 'flex';
 
-  const email = reg-email.value.trim();
-  const pass = reg-pass.value;
-  const confirm = reg-confirm.value;
-  const tvName = reg-tvname.value.trim();
-  const phone = reg-phone.value.trim();
-  const logoFile = file-input.files[0];
+  const tvName = document.getElementById('reg-tvname').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  const logoFile = document.getElementById('file-input').files[0];
 
+  /* ==== VALIDATIONS ==== */
   if (!logoFile) {
-    showNotif("Dole sai ka saka Logo Image!", true);
-    loader.style.display = "none";
+    showNotif("Dole sai ka saka logo kafin register!", true);
+    loader.style.display = 'none';
     return;
   }
 
   if (pass !== confirm) {
-    showNotif("Password ba su dace ba!", true);
-    loader.style.display = "none";
+    showNotif("Kalmar sirri bata zo daya ba!", true);
+    loader.style.display = 'none';
     return;
   }
 
-  let userCred;
+  if (pass.length < 6) {
+    showNotif("Password dole ya zama akalla haruffa 6", true);
+    loader.style.display = 'none';
+    return;
+  }
 
   try {
+    /* 1️⃣ Upload Logo */
     const logoLink = await uploadToImgur(logoFile);
-    userCred = await createUserWithEmailAndPassword(auth, email, pass);
+
+    /* 2️⃣ Create Auth Account */
+    const userCred = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCred.user.uid;
 
-    await set(ref(db, "users/" + uid), {
-      tvName,
+    /* 3️⃣ Save User Data */
+    await set(ref(db, 'users/' + uid), {
+      uid: uid,
+      tvName: tvName,
       phoneNumber: phone,
-      email: email.toLowerCase(),
-      remain: 5,
+      email: email,
       logoImage: logoLink,
+      remain: 5,
       getNews: "on",
       Wasanin: "on",
       getPost: "on",
-      registerTime: new Date().toISOString(),
-      uid
+      registerTime: new Date().toISOString()
     });
 
-    showNotif("Register yayi nasara! 🎉");
-  } catch (err) {
-    if (auth.currentUser) await deleteUser(auth.currentUser);
-    showNotif(err.message, true);
-  } finally {
-    loader.style.display = "none";
-  }
-};
+    showNotif("Rijista tayi nasara! Barka da zuwa.");
 
-// ================= LOGIN =================
-document.getElementById('form-login').onsubmit = async (e) => {
+  } catch (err) {
+    showNotif(err.message.replace('Firebase:', ''), true);
+  } finally {
+    loader.style.display = 'none';
+  }
+});
+
+/* ================= LOGIN ================= */
+document.getElementById('form-login').addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const loader = document.getElementById('loader');
-  loader.style.display = "flex";
+  loader.style.display = 'flex';
+
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
 
   try {
-    await signInWithEmailAndPassword(auth, login-email.value, login-pass.value);
+    await signInWithEmailAndPassword(auth, email, pass);
     showNotif("Kana shiga...");
   } catch {
     showNotif("Email ko Password ba daidai ba!", true);
   } finally {
-    loader.style.display = "none";
+    loader.style.display = 'none';
   }
-};
+});
 </script>
 
 </body>
