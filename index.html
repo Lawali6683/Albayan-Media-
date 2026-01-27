@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albayan Media</title>
+    
+        <meta property="og:title" content="Albayan Media - Dilancin Labarai na Zamani" />
+    <meta property="og:description" content="Albayan Media shine babban dandalin dilancin labarai ga gidajen TV da kafafen sada zumunta. Samun labarai masu inganci tare da sunan kamfaninku da logonku don dorawa a shafukanku cikin sauki." />
+    <meta property="og:image" content="https://i.imgur.com/D96clzc.jpeg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://albayanmedia.pages.dev/" />
+    <link rel="icon" type="image/png" href="https://i.imgur.com/jnrrUhx.png" />
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --main-color: #00d2ff;
+            --accent-color: #3a7bd5;
+            --glass: rgba(255, 255, 255, 0.1);
+            --bg-dark: #0f0f0f;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background: var(--bg-dark); color:  #00d2ff; overflow-x: hidden; }
+
+        /* Banner Style */
+         .hero-section {
+         width: 100%;
+            height: 250px;
+            background: url('https://i.imgur.com/owvt5nc.jpeg') no-repeat center center/cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-color);
+       }
+       
+        .banner-text {
+        
+        filter: grayscale(0%) sepia(50%) contrast(110%) brightness(0.8);
+  background-image: 
+    linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.3)), 
+    url('hotonka.jpg');
+  cursor: pointer;
+  
+            
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            Font-weight: bold;
+            
+        }
+        
+       
+
+        .banner-text p { font-size: 0.95rem; color:  white; line-height: 1.4; }
+        .banner-text a { color: var(--main-color); text-decoration: none; font-weight: bold; }
+
+        /* Floating Buttons on Banner */
+        .banner-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-bottom: 15px;
+        }
+
+        .hero-btn {
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 2px solid var(--main-color);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: 0.4s;
+            font-weight: bold;
+        }
+
+        .hero-btn:hover, .hero-btn.active {
+            background: var(--main-color);
+            box-shadow: 0 0 15px var(--main-color);
+        }
+
+        /* Form Styling */
+        .container {
+            width: 95%;
+            max-width: 450px;
+            margin: -20px auto 50px auto;
+            background: rgba(20, 20, 20, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 10;
+        }
+
+        .tab-menu {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active { color: var(--main-color); border-bottom: 2px solid var(--main-color); }
+
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-group label { display: block; margin-bottom: 5px; color: white; font-size: 0.85rem; }
+        
+        input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+        }
+
+        .input-group i:not(.eye-icon) { position: absolute; left: 15px; top: 38px; color: var(--main-color); }
+        .eye-icon { position: absolute; right: 15px; top: 38px; cursor: pointer; color: #666; }
+
+        /* Logo Upload */
+        .logo-box {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #444;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        #logo-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--main-color), var(--accent-color));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Notification System */
+        .push-notif {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            width: 90%; max-width: 400px; background: white; color: #333;
+            padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; transition: 0.5s;
+        }
+
+        .push-notif.show { transform: translateX(-50%) translateY(0); }
+
+        /* Loader */
+        #loader {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 3000; flex-direction: column; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--main-color);"></i>
+        <p style="margin-top: 15px;">Muna aiki, jira kadan...</p>
+    </div>
+
+    <div id="notif-container" class="push-notif">
+        <i id="notif-icon" class="fas fa-info-circle"></i>
+        <span id="notif-msg"></span>
+    </div>
+ <section class="hero-section">
+        <div class="banner-actions">
+  
+        </div>
+   
+        <div class="banner-text">
+            <p>Samun sabbin Labarai, da tsarin Zane Wanda yake da sunan campany ku da logo, copy kawai zaku yi ku dora a page din ku. <a href="about.html">(Read more)</a></p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="tab-menu">
+            <button class="tab-btn active" id="tab-reg" onclick="showForm('reg')">Register</button>
+            <button class="tab-btn" id="tab-login" onclick="showForm('login')">Login</button>
+        </div>
+
+        <form id="form-register">
+            <div class="logo-box" onclick="document.getElementById('file-input').click()">
+                <i class="fas fa-cloud-upload-alt" id="upload-icon"></i>
+                <img id="logo-preview">
+                <input type="file" id="file-input" hidden accept="image/*">
+            </div>
+            <p style="text-align:center; font-size: 0.8rem; margin-bottom: 15px; color: #888;">Add TV/Page Logo</p>
+
+            <div class="input-group">
+                <label>TV/Page Name</label>
+                <i class="fas fa-tv"></i>
+                <input type="text" id="reg-tvname" placeholder="Sunan Shafinka" required>
+            </div>
+
+            <div class="input-group">
+                <label>Phone Number</label>
+                <i class="fas fa-phone-alt"></i>
+                <input type="tel" id="reg-phone" placeholder="08012345678" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="reg-email" placeholder="email@shafi.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" id="reg-pass" required>
+                <i class="fas fa-eye eye-icon" onclick="togglePass('reg-pass')"></i>
+            </div>
+
+            <div class="input-group">
+                <label>Confirm Password</label>
+                <i class="fas fa-check-circle"></i>
+                <input type="password" id="reg-confirm" required>
+            </div>
+
+            <button type="submit" class="btn-submit">SUBMIT <i class="fas fa-paper-plane"></i></button>
+        </form>
+
+        <form id="form-login" style="display: none;">
+            <div class="input-group">
+                <label>Email Address</label>
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" id="login-pass" required>
+                <i class="fas fa-eye eye-icon" onclick="togglePass('login-pass')"></i>
+            </div>
+            <button type="submit" class="btn-submit">LOGIN <i class="fas fa-sign-in-alt"></i></button>
+            <div style="text-align:center; margin-top:15px;">
+                <a href="contact.html" style="color: #888; text-decoration: none; font-size: 0.85rem;">Forgot password?</a>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { app } from './firebase.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const IMGUR_CLIENT_ID = "5acf7eff9c91660";
+
+        const admins = [
+            "harunalawali5522@gmail.com",
+            "lawaliharuna943@gmail.com",
+            "nafiulawaliabubakar@gmail.com"
+        ];
+
+        // --- Auth Auto-Check ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userEmail = user.email.toLowerCase();
+                if (admins.includes(userEmail)) {
+                    window.location.href = "adminPage.html";
+                } else {
+                    window.location.href = "dashboard.html";
+                }
+            }
+        });
+
+        // --- Helper Functions ---
+        window.showForm = (type) => {
+            document.getElementById('form-register').style.display = type === 'reg' ? 'block' : 'none';
+            document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('tab-reg').classList.toggle('active', type === 'reg');
+            document.getElementById('tab-login').classList.toggle('active', type === 'login');
+        };
+
+        window.togglePass = (id) => {
+            const el = document.getElementById(id);
+            el.type = el.type === "password" ? "text" : "password";
+        };
+
+        function showNotif(msg, isError = false) {
+            const box = document.getElementById('notif-container');
+            const icon = document.getElementById('notif-icon');
+            document.getElementById('notif-msg').innerText = msg;
+            box.style.borderLeft = isError ? "5px solid red" : "5px solid green";
+            icon.style.color = isError ? "red" : "green";
+            box.classList.add('show');
+            setTimeout(() => box.classList.remove('show'), 4000);
+        }
+
+        // --- Image Preview ---
+        document.getElementById('file-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('logo-preview').src = URL.createObjectURL(file);
+                document.getElementById('logo-preview').style.display = 'block';
+                document.getElementById('upload-icon').style.display = 'none';
+            }
+        };
+
+        // --- Imgur Upload Function ---
+        async function uploadToImgur(file) {
+            if (!file) return "https://i.imgur.com/6VBx3io.png";
+            const formData = new FormData();
+            formData.append('image', file);
+            const res = await fetch('https://api.imgur.com/3/image', {
+                method: 'POST',
+                headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
+                body: formData
+            });
+            const data = await res.json();
+            return data.data.link;
+        }
+
+        // --- Register Logic ---
+        document.getElementById('form-register').onsubmit = async (e) => {
+            e.preventDefault();
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            const tvName = document.getElementById('reg-tvname').value;
+            const phone = document.getElementById('reg-phone').value;
+            const logoFile = document.getElementById('file-input').files[0];
+
+            if (pass !== confirm) {
+                showNotif("Kalmar sirri bata zo daya ba!", true);
+                loader.style.display = 'none';
+                return;
+            }
+
+            try {
+                const logoLink = await uploadToImgur(logoFile);
+                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                const uid = userCred.user.uid;
+
+                // Aje dukkan data kamar yadda kace
+                await set(ref(db, 'users/' + uid), {
+                    tvName: tvName,
+                    phoneNumber: phone,
+                    email: email.toLowerCase(),
+                    password: pass,
+                    remain: 5,
+                    logoImage: logoLink,
+                    getNews: "on",
+                    Wasanin: "on",
+                    getPost: "on",
+                    registerTime: new Date().toLocaleString(),
+                    uid: uid
+                });
+
+                showNotif("Rijista tayi nasara! Barka da zuwa.");
+            } catch (err) {
+                showNotif("Error: " + err.message, true);
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+
+        // --- Login Logic ---
+        document.getElementById('form-login').onsubmit = async (e) => {
+            e.preventDefault();
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showNotif("Kana shiga...");
+            } catch (err) {
+                showNotif("Email ko Password ba daidai ba!", true);
+            } finally {
+                loader.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
