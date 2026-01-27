@@ -374,7 +374,6 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
   const confirm = document.getElementById('reg-confirm').value;
   const logoFile = document.getElementById('file-input').files[0];
 
-  /* ==== VALIDATIONS ==== */
   if (!logoFile) {
     showNotif("Dole sai ka saka logo kafin register!", true);
     loader.style.display = 'none';
@@ -387,38 +386,30 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
     return;
   }
 
-  if (pass.length < 6) {
-    showNotif("Password dole ya zama akalla haruffa 6", true);
-    loader.style.display = 'none';
-    return;
-  }
-
   try {
-    /* 1️⃣ Upload Logo */
     const logoLink = await uploadToImgur(logoFile);
 
-    /* 2️⃣ Create Auth Account */
     const userCred = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = userCred.user.uid;
 
-    /* 3️⃣ Save User Data */
     await set(ref(db, 'users/' + uid), {
       uid: uid,
       tvName: tvName,
       phoneNumber: phone,
       email: email,
+      password: pass,          
       logoImage: logoLink,
       remain: 5,
       getNews: "on",
       Wasanin: "on",
       getPost: "on",
-      registerTime: new Date().toISOString()
+      registerTime: new Date().toLocaleString()
     });
 
     showNotif("Rijista tayi nasara! Barka da zuwa.");
 
   } catch (err) {
-    showNotif(err.message.replace('Firebase:', ''), true);
+    showNotif(err.message, true);
   } finally {
     loader.style.display = 'none';
   }
