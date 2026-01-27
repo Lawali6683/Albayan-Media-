@@ -270,144 +270,157 @@
     </div>
 
     <script type="module">
-        import { app } from './firebase.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { app } from './firebase.js';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  deleteUser
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-        const auth = getAuth(app);
-        const db = getDatabase(app);
-        const IMGUR_CLIENT_ID = "5acf7eff9c91660";
+import {
+  getDatabase,
+  ref,
+  set,
+  get
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
-        const admins = [
-            "harunalawali5522@gmail.com",
-            "lawaliharuna943@gmail.com",
-            "nafiulawaliabubakar@gmail.com"
-        ];
+const auth = getAuth(app);
+const db = getDatabase(app);
+const IMGUR_CLIENT_ID = "5acf7eff9c91660";
 
-        // --- Auth Auto-Check ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userEmail = user.email.toLowerCase();
-                if (admins.includes(userEmail)) {
-                    window.location.href = "adminPage.html";
-                } else {
-                    window.location.href = "dashboard.html";
-                }
-            }
-        });
+const admins = [
+  "harunalawali5522@gmail.com",
+  "lawaliharuna943@gmail.com",
+  "nafiulawaliabubakar@gmail.com"
+];
 
-        // --- Helper Functions ---
-        window.showForm = (type) => {
-            document.getElementById('form-register').style.display = type === 'reg' ? 'block' : 'none';
-            document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
-            document.getElementById('tab-reg').classList.toggle('active', type === 'reg');
-            document.getElementById('tab-login').classList.toggle('active', type === 'login');
-        };
+// ================= AUTH CHECK =================
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
+  const email = user.email.toLowerCase();
+  window.location.href = admins.includes(email)
+    ? "adminPage.html"
+    : "dashboard.html";
+});
 
-        window.togglePass = (id) => {
-            const el = document.getElementById(id);
-            el.type = el.type === "password" ? "text" : "password";
-        };
+// ================= UI HELPERS =================
+window.showForm = (type) => {
+  document.getElementById('form-register').style.display = type === 'reg' ? 'block' : 'none';
+  document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+};
 
-        function showNotif(msg, isError = false) {
-            const box = document.getElementById('notif-container');
-            const icon = document.getElementById('notif-icon');
-            document.getElementById('notif-msg').innerText = msg;
-            box.style.borderLeft = isError ? "5px solid red" : "5px solid green";
-            icon.style.color = isError ? "red" : "green";
-            box.classList.add('show');
-            setTimeout(() => box.classList.remove('show'), 4000);
-        }
+window.togglePass = (id) => {
+  const el = document.getElementById(id);
+  el.type = el.type === "password" ? "text" : "password";
+};
 
-        // --- Image Preview ---
-        document.getElementById('file-input').onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('logo-preview').src = URL.createObjectURL(file);
-                document.getElementById('logo-preview').style.display = 'block';
-                document.getElementById('upload-icon').style.display = 'none';
-            }
-        };
+function showNotif(msg, error = false) {
+  const box = document.getElementById('notif-container');
+  const icon = document.getElementById('notif-icon');
+  document.getElementById('notif-msg').innerText = msg;
+  box.style.borderLeft = error ? "5px solid red" : "5px solid green";
+  icon.style.color = error ? "red" : "green";
+  box.classList.add('show');
+  setTimeout(() => box.classList.remove('show'), 4000);
+}
 
-        // --- Imgur Upload Function ---
-        async function uploadToImgur(file) {
-            if (!file) return "https://i.imgur.com/6VBx3io.png";
-            const formData = new FormData();
-            formData.append('image', file);
-            const res = await fetch('https://api.imgur.com/3/image', {
-                method: 'POST',
-                headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
-                body: formData
-            });
-            const data = await res.json();
-            return data.data.link;
-        }
+// ================= IMAGE PREVIEW =================
+document.getElementById('file-input').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('logo-preview').src = URL.createObjectURL(file);
+  document.getElementById('logo-preview').style.display = 'block';
+  document.getElementById('upload-icon').style.display = 'none';
+};
 
-        // --- Register Logic ---
-        document.getElementById('form-register').onsubmit = async (e) => {
-            e.preventDefault();
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
+// ================= IMGUR UPLOAD =================
+async function uploadToImgur(file) {
+  const fd = new FormData();
+  fd.append("image", file);
 
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const confirm = document.getElementById('reg-confirm').value;
-            const tvName = document.getElementById('reg-tvname').value;
-            const phone = document.getElementById('reg-phone').value;
-            const logoFile = document.getElementById('file-input').files[0];
+  const res = await fetch("https://api.imgur.com/3/image", {
+    method: "POST",
+    headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
+    body: fd
+  });
 
-            if (pass !== confirm) {
-                showNotif("Kalmar sirri bata zo daya ba!", true);
-                loader.style.display = 'none';
-                return;
-            }
+  const data = await res.json();
+  if (!data.success) throw new Error("Image upload failed");
+  return data.data.link;
+}
 
-            try {
-                const logoLink = await uploadToImgur(logoFile);
-                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-                const uid = userCred.user.uid;
+// ================= REGISTER =================
+document.getElementById('form-register').onsubmit = async (e) => {
+  e.preventDefault();
+  const loader = document.getElementById('loader');
+  loader.style.display = "flex";
 
-                // Aje dukkan data kamar yadda kace
-                await set(ref(db, 'users/' + uid), {
-                    tvName: tvName,
-                    phoneNumber: phone,
-                    email: email.toLowerCase(),
-                    password: pass,
-                    remain: 5,
-                    logoImage: logoLink,
-                    getNews: "on",
-                    Wasanin: "on",
-                    getPost: "on",
-                    registerTime: new Date().toLocaleString(),
-                    uid: uid
-                });
+  const email = reg-email.value.trim();
+  const pass = reg-pass.value;
+  const confirm = reg-confirm.value;
+  const tvName = reg-tvname.value.trim();
+  const phone = reg-phone.value.trim();
+  const logoFile = file-input.files[0];
 
-                showNotif("Rijista tayi nasara! Barka da zuwa.");
-            } catch (err) {
-                showNotif("Error: " + err.message, true);
-            } finally {
-                loader.style.display = 'none';
-            }
-        };
+  if (!logoFile) {
+    showNotif("Dole sai ka saka Logo Image!", true);
+    loader.style.display = "none";
+    return;
+  }
 
-        // --- Login Logic ---
-        document.getElementById('form-login').onsubmit = async (e) => {
-            e.preventDefault();
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
+  if (pass !== confirm) {
+    showNotif("Password ba su dace ba!", true);
+    loader.style.display = "none";
+    return;
+  }
 
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
+  let userCred;
 
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                showNotif("Kana shiga...");
-            } catch (err) {
-                showNotif("Email ko Password ba daidai ba!", true);
-            } finally {
-                loader.style.display = 'none';
-            }
-        };
-    </script>
+  try {
+    const logoLink = await uploadToImgur(logoFile);
+    userCred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = userCred.user.uid;
+
+    await set(ref(db, "users/" + uid), {
+      tvName,
+      phoneNumber: phone,
+      email: email.toLowerCase(),
+      remain: 5,
+      logoImage: logoLink,
+      getNews: "on",
+      Wasanin: "on",
+      getPost: "on",
+      registerTime: new Date().toISOString(),
+      uid
+    });
+
+    showNotif("Register yayi nasara! 🎉");
+  } catch (err) {
+    if (auth.currentUser) await deleteUser(auth.currentUser);
+    showNotif(err.message, true);
+  } finally {
+    loader.style.display = "none";
+  }
+};
+
+// ================= LOGIN =================
+document.getElementById('form-login').onsubmit = async (e) => {
+  e.preventDefault();
+  const loader = document.getElementById('loader');
+  loader.style.display = "flex";
+
+  try {
+    await signInWithEmailAndPassword(auth, login-email.value, login-pass.value);
+    showNotif("Kana shiga...");
+  } catch {
+    showNotif("Email ko Password ba daidai ba!", true);
+  } finally {
+    loader.style.display = "none";
+  }
+};
+</script>
+
 </body>
 </html>
