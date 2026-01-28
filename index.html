@@ -286,6 +286,8 @@ import {
   set
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
+let isRegistering = false;
+
 const auth = getAuth(app);
 const db = getDatabase(app);
 const IMGUR_CLIENT_ID = "5acf7eff9c91660";
@@ -299,8 +301,9 @@ const admins = [
 /* ================= AUTH AUTO REDIRECT ================= */
 onAuthStateChanged(auth, (user) => {
   if (!user) return;
+  if (isRegistering) return; // ⛔ hana auto redirect
 
-  const email = user.email.toLowerCase();
+  const email = user.email;
   if (admins.includes(email)) {
     window.location.href = "adminPage.html";
   } else {
@@ -363,13 +366,14 @@ async function uploadToImgur(file) {
 /* ================= REGISTER ================= */
 document.getElementById('form-register').addEventListener('submit', async (e) => {
   e.preventDefault();
+  isRegistering = true; // 🔐 lock redirect
 
   const loader = document.getElementById('loader');
   loader.style.display = 'flex';
 
   const tvName = document.getElementById('reg-tvname').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
-  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const email = document.getElementById('reg-email').value.trim();
   const pass = document.getElementById('reg-pass').value;
   const confirm = document.getElementById('reg-confirm').value;
   const logoFile = document.getElementById('file-input').files[0];
@@ -377,12 +381,14 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
   if (!logoFile) {
     showNotif("Dole sai ka saka logo kafin register!", true);
     loader.style.display = 'none';
+    isRegistering = false;
     return;
   }
 
   if (pass !== confirm) {
     showNotif("Kalmar sirri bata zo daya ba!", true);
     loader.style.display = 'none';
+    isRegistering = false;
     return;
   }
 
@@ -393,23 +399,32 @@ document.getElementById('form-register').addEventListener('submit', async (e) =>
     const uid = userCred.user.uid;
 
     await set(ref(db, 'users/' + uid), {
-      uid: uid,
-      tvName: tvName,
+      uid,
+      tvName,
       phoneNumber: phone,
-      email: email,
-      password: pass,          
+      email,
+      password: pass,   // ⚠️ (ba recommended amma ka nema)
       logoImage: logoLink,
       remain: 5,
       getNews: "on",
       Wasanin: "on",
       getPost: "on",
-      registerTime: new Date().toLocaleString()
+      registerTime: Date.now()
     });
 
-    showNotif("Rijista tayi nasara! Barka da zuwa.");
+    showNotif("Rijista tayi nasara! Ana shigar da kai...");
+
+    setTimeout(() => {
+      if (admins.includes(email)) {
+        window.location.href = "adminPage.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    }, 1500);
 
   } catch (err) {
     showNotif(err.message, true);
+    isRegistering = false;
   } finally {
     loader.style.display = 'none';
   }
