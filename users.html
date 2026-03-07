@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sarrafa Users</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d2ff;            
+            --accent: #00f2fe;
+            --dark: #0f0f0f;
+            --glass: rgba(255, 255, 255, 0.05);
+            --card-bg: #1e293b;
+            --danger: #ff4d4d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--dark); color: white; padding-top: 80px; overflow-x: hidden; }
+
+        .notif-container {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.95);
+            color: #1e293b; padding: 15px; border-radius: 12px; z-index: 10000;
+            display: flex; align-items: center; gap: 12px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-left: 5px solid var(--primary);
+        }
+        .notif-container.active { top: 20px; }
+        .notif-container i { font-size: 20px; color: var(--primary); }
+
+        header {
+            position: fixed; top: 0; width: 100%; height: 65px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000; border-bottom: 1px solid var(--glass);
+        }
+        .header-logo { height: 35px; }
+
+        .container { padding: 15px; max-width: 1000px; margin: auto; }
+        .user-card {
+            background: var(--card-bg); border-radius: 15px; padding: 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; border: 1px solid var(--glass);
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-logo-round { 
+            width: 55px; height: 55px; border-radius: 50%; 
+            object-fit: cover; border: 2px solid var(--primary); cursor: pointer;
+        }
+
+        .edit-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
+            justify-content: center; align-items: center; overflow-y: auto;
+        }
+        .edit-card {
+            background: #1e293b; width: 90%; max-width: 450px; padding: 25px;
+            border-radius: 20px; position: relative; border: 1px solid var(--glass);
+        }
+        .edit-card input, .edit-card select {
+            width: 100%; padding: 12px; margin: 10px 0;
+            background: #0f172a; border: 1px solid var(--glass);
+            border-radius: 10px; color: white; outline: none;
+        }
+        .update-btn {
+            width: 100%; background: var(--primary); color: black;
+            border: none; padding: 15px; border-radius: 12px;
+            font-weight: bold; cursor: pointer; margin-top: 15px;
+        }
+
+        #img-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 3000;
+            justify-content: center; align-items: center;
+        }
+        #modal-img { max-width: 90%; max-height: 80%; border-radius: 10px; border: 2px solid var(--primary); }
+
+        #loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark); display: flex; justify-content: center;
+            align-items: center; z-index: 9999;
+        }
+        
+             
+.menu-toggle { font-size: 24px; cursor: pointer; color: var(--primary); }
+
+.sidebar {
+    position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
+    background: #1e293b; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    border-right: 1px solid var(--glass);
+}
+
+.sidebar.active { left: 0; }
+
+.sidebar-header { 
+    display: flex; justify-content: space-between; 
+    align-items: center; margin-bottom: 30px; 
+}
+
+.sidebar-menu { list-style: none; padding: 0; }
+
+.sidebar-menu li { 
+    margin: 10px 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+}
+
+.sidebar-menu a { 
+    color: #cbd5e1; text-decoration: none; font-size: 17px; 
+    display: flex; align-items: center; padding: 12px 0;
+    transition: 0.3s;
+}
+
+.sidebar-menu a:hover { color: var(--primary); }
+
+.sidebar-menu i { margin-right: 15px; width: 25px; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div id="loader"><i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--primary)"></i></div>
+
+    <div id="notif-bar" class="notif-container">
+        <i id="notif-icon" class="fas fa-info-circle"></i>
+        <div id="notif-msg" style="font-size: 14px; font-weight: 500;"></div>
+    </div>
+
+    <header>
+    <i class="fas fa-bars icon-btn" id="openMenu" style="color:var(--primary); font-size: 20px; cursor: pointer;"></i>
+    <img src="https://i.imgur.com/WeJt7D6.png" class="header-logo" alt="Logo">
+    <span id="userCount" style="color: var(--primary); font-weight: bold; font-size: 14px;">0 Users</span>
+</header>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span style="font-weight: bold; color: var(--primary);">MENU</span>
+        <i class="fas fa-times menu-toggle" id="closeMenu"></i>
+    </div>
+    <ul class="sidebar-menu">
+        <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+        <li><a href="costomer.html"><i class="fas fa-users"></i> All Users</a></li>
+        <li><a href="leaning.html"><i class="fas fa-book"></i> Soail Media Course</a></li>
+        <li><a href="about.html"><i class="fas fa-user-circle"></i> About Us</a></li>
+        <li><a href="about.html"><i class="fas fa-envelope"></i> Contact</a></li>
+        <li id="logoutBtn" style="border:none; margin-top: 50px;">
+            <a href="#" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+    </ul>
+</div>
+
+<div id="menuOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1999; display:none;"></div>
+
+    <div class="container" id="userList"></div>
+
+    <div id="editOverlay" class="edit-overlay">
+        <div class="edit-card">
+            <i class="fas fa-times" onclick="closeEdit()" style="position:absolute; top:15px; right:15px; cursor:pointer; color: var(--danger);"></i>
+            <center>
+                <div style="position: relative; display: inline-block; margin-bottom: 10px;">
+                    <img id="editLogoPreview" class="user-logo-round" style="width: 85px; height: 85px;">
+                    <i class="fas fa-camera" onclick="document.getElementById('logoInput').click()" style="position:absolute; bottom:0; right:0; background:var(--primary); padding:6px; border-radius:50%; color:black; font-size:12px; cursor:pointer;"></i>
+                </div>
+            </center>
+            <input type="file" id="logoInput" hidden accept="image/*">
+            <input type="text" id="editTvName" placeholder="Sunan TV">
+            <input type="email" id="editEmail" placeholder="Email Address">
+            <input type="text" id="editPhone" placeholder="Phone Number">
+            <input type="text" id="editPass" placeholder="Password">
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="editRemain" placeholder="Remain Posts" style="flex:1">
+                <select id="editGetNews" style="flex:1">
+                    <option value="on">News: ON</option>
+                    <option value="off">News: OFF</option>
+                </select>
+            </div>
+            <button class="update-btn" id="saveUpdateBtn">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <div id="img-modal" onclick="this.style.display='none'">
+        <i class="fas fa-times" style="position: absolute; top: 20px; right: 20px; font-size: 25px; color: white;"></i>
+        <img id="modal-img">
+    </div>
+
+    <script type="module">
+        import { app } from './firebase.js';
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const IMGUR_CLIENT_ID = "5acf7eff9c91660";
+        let currentEditUid = null;
+        let selectedFile = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                initApp();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        function initApp() {
+            onValue(ref(db, 'users'), (snapshot) => {
+                const list = document.getElementById('userList');
+                list.innerHTML = "";
+                const data = snapshot.val();
+                let count = 0;
+
+                if (data) {
+                    Object.keys(data).forEach(uid => {
+                        count++;
+                        const u = data[uid];
+                        const card = document.createElement('div');
+                        card.className = 'user-card';
+                        card.innerHTML = `
+                            <div class="user-info">
+                                <img src="${u.logoImage}" class="user-logo-round" onclick="viewImage('${u.logoImage}')">
+                                <div class="user-details">
+                                    <h3 style="font-size:15px;">${u.tvName}</h3>
+                                    <span style="color:#94a3b8; font-size:11px;">Remain: ${u.remain} | News: ${u.getNews}</span>
+                                </div>
+                            </div>
+                            <button onclick="openEdit('${uid}')" style="background:var(--glass); border:1px solid var(--primary); color:var(--primary); padding:7px 12px; border-radius:8px; font-size:12px; cursor:pointer;">Update</button>
+                        `;
+                        list.appendChild(card);
+                    });
+                }
+                document.getElementById('userCount').innerText = count + " Users";
+                document.getElementById('loader').style.display = "none";
+            });
+        }
+
+        window.openEdit = (uid) => {
+            currentEditUid = uid;
+            onValue(ref(db, `users/${uid}`), (snap) => {
+                const u = snap.val();
+                document.getElementById('editLogoPreview').src = u.logoImage;
+                document.getElementById('editTvName').value = u.tvName;
+                document.getElementById('editEmail').value = u.email;
+                document.getElementById('editPhone').value = u.phoneNumber;
+                document.getElementById('editPass').value = u.password;
+                document.getElementById('editRemain').value = u.remain;
+                document.getElementById('editGetNews').value = u.getNews;
+                document.getElementById('editOverlay').style.display = 'flex';
+            }, { onlyOnce: true });
+        };
+
+        window.closeEdit = () => {
+            document.getElementById('editOverlay').style.display = 'none';
+            selectedFile = null;
+        };
+
+        document.getElementById('logoInput').onchange = (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                document.getElementById('editLogoPreview').src = URL.createObjectURL(selectedFile);
+            }
+        };
+
+        document.getElementById('saveUpdateBtn').onclick = async () => {
+            const btn = document.getElementById('saveUpdateBtn');
+            btn.disabled = true;
+            showNotif("Muna kan loda bayanan...", "info");
+
+            try {
+                let logoUrl = document.getElementById('editLogoPreview').src;
+                if (selectedFile) {
+                    logoUrl = await uploadToImgur(selectedFile);
+                }
+
+                const updates = {
+                    tvName: document.getElementById('editTvName').value,
+                    email: document.getElementById('editEmail').value,
+                    phoneNumber: document.getElementById('editPhone').value,
+                    password: document.getElementById('editPass').value,
+                    remain: parseInt(document.getElementById('editRemain').value),
+                    getNews: document.getElementById('editGetNews').value,
+                    logoImage: logoUrl
+                };
+
+                await update(ref(db, `users/${currentEditUid}`), updates);
+                showNotif("An yi nasarar gyara bayanan user! ✅", "success");
+                closeEdit();
+            } catch (err) {
+                showNotif("An samu matsala: " + err.message, "danger");
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        async function uploadToImgur(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            const res = await fetch('https://api.imgur.com/3/image', {
+                method: 'POST',
+                headers: { Authorization: `Client-ID ${IMGUR_CLIENT_ID}` },
+                body: formData
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error("Logo upload failed");
+            return data.data.link;
+        }
+
+        window.viewImage = (url) => {
+            document.getElementById('modal-img').src = url;
+            document.getElementById('img-modal').style.display = 'flex';
+        };
+
+        function showNotif(msg, type) {
+            const bar = document.getElementById('notif-bar');
+            const msgEl = document.getElementById('notif-msg');
+            msgEl.innerText = msg;
+            bar.style.borderLeft = type === "danger" ? "5px solid #ff4d4d" : "5px solid #00d2ff";
+            bar.classList.add('active');
+            setTimeout(() => bar.classList.remove('active'), 3500);
+        }
+        
+                        
+      
+const sidebar = document.getElementById('sidebar');
+const openMenu = document.getElementById('openMenu');
+const closeMenu = document.getElementById('closeMenu');
+const menuOverlay = document.getElementById('menuOverlay');
+
+
+openMenu.onclick = () => {
+    sidebar.classList.add('active');
+    menuOverlay.style.display = 'block';
+};
+
+
+const hideSidebar = () => {
+    sidebar.classList.remove('active');
+    menuOverlay.style.display = 'none';
+};
+
+closeMenu.onclick = hideSidebar;
+menuOverlay.onclick = hideSidebar;
+
+
+import { signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+document.getElementById('logoutBtn').onclick = async (e) => {
+    e.preventDefault();
+    if(confirm("Kana bukatar fita daga shafin nan?")) {
+        try {
+            await signOut(auth);
+            window.location.href = "login.html";
+        } catch (error) {
+            showNotif("Fita ta gaza: " + error.message, "danger");
+        }
+    }
+};
+    </script>
+</body>
+</html>

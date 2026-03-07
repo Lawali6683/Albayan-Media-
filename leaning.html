@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Albayan Media Learning</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --accent: #00f2fe;
+            --dark: #0a0f1a;
+            --card: #161e2d;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0a0f1a 100%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 140px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: #000;
+            padding: 8px 25px;
+            border-radius: 50px;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .main-title {
+            font-size: 24px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .intro-text {
+            background: var(--glass);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .section-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .list-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        .list-item i {
+            color: var(--primary);
+            margin-top: 4px;
+            font-size: 14px;
+        }
+
+        .price-tag {
+            background: rgba(0, 210, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px dashed var(--primary);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .result-box {
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .footer-cta {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--glass);
+        }
+
+        .btn-interest {
+            display: inline-block;
+            background: var(--primary);
+            color: #000;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn-interest:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+        }
+
+        span.highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-box">
+            <img src="https://i.imgur.com/WeJt7D6.png" class="logo" alt="Logo">
+            <br>
+            <div class="coming-soon-badge">Coming Soon</div>
+            <h1 class="main-title">📣 KOYON SOCIAL MEDIA DOMIN MASU YADA LABARAI</h1>
+        </div>
+
+        <div class="intro-text">
+            Kana da <span class="highlight">Facebook Page, WhatsApp Channel, Instagram, X ko YouTube TV</span>, amma shafinka baya girma yadda kake so?
+            <br><br>
+            Wannan koyarwar an tanade ta ne domin:
+            <br>
+            • masu shafin yada labarai
+            <br>
+            • masu YouTube TV / Online TV
+            <br>
+            • da duk wanda yake son bunkasa shafinsa cikin tsari na zamani
+        </div>
+
+        <div class="section-card">
+            <h2>🎯 Me za ka koya?</h2>
+            <p style="margin-bottom: 15px;">Za mu koya maka:</p>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake gina shafin yada labarai daga tushe</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake bunkasa shafi ba tare da wahala ba</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake hada tsohon shafi da sabon shafi su zama ɗaya mai ƙarfi</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake tsara labari da zai ja hankalin mutane</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake wallafa labari daidai da algorithm na Facebook, Instagram da X</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake amfani da hoto, rubutu da lokaci domin ƙara reach</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake sarrafa Page, Group, Channel da Account cikin sauƙi</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake bunkasa Facebook, WhatsApp Channel, Instagram, X da YouTube TV</span></div>
+            <div class="list-item"><i class="fas fa-check-circle"></i> <span>yadda ake amfani da rubutu, hoto da lokaci domin ƙara views da followers</span></div>
+        </div>
+
+        <div class="section-card">
+            <h2>💡 Me ya bambanta wannan koyarwa?</h2>
+            <div class="list-item"><i class="fas fa-star"></i> <span>Ana koyarwa a Hausa mai sauƙi</span></div>
+            <div class="list-item"><i class="fas fa-star"></i> <span>Abubuwan da ake koya ana aiki da su a zahiri</span></div>
+            <div class="list-item"><i class="fas fa-star"></i> <span>Ya dace da fara shafi ko ci gaba da tsoho</span></div>
+            <div class="list-item"><i class="fas fa-star"></i> <span>Ba surutu, gaskiya ake koyarwa</span></div>
+        </div>
+
+        <div class="section-card">
+            <h2>💰 Game da course ɗin</h2>
+            <p>Wannan koyarwa na sayarwa ce,</p>
+            <div class="price-tag">
+                amma an tsara ta a farashi mai sauƙi domin kowa ya iya samu.
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2>🚀 Me za ka samu?</h2>
+            <div class="results-grid">
+                <div class="result-box">Fahimtar yadda shafinka ke aiki</div>
+                <div class="result-box">Sauƙin sarrafa Page, Channel da YouTube TV</div>
+                <div class="result-box">za ka iya inganta shafinka da kanka</div>
+                <div class="result-box">Ƙarin views da amincewar masu kallo</div>
+                <div class="result-box">za ka fara ganin canji a views da followers</div>
+                <div class="result-box">za ka iya gina shafi mai daraja da amincewa</div>
+                <div class="result-box">Ilimi da zai daɗe yana amfanar da kai</div>
+            </div>
+        </div>
+
+        <div class="footer-cta">
+            <h3 style="color: var(--primary);">COMING SOON</h3>
+            <p style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Kada ka manta, Albayan Media koyaushe tana tare da ku don inganta fasaharku.</p>
+            <a href="#" class="btn-interest">Ina Sha'awar Shiga</a>
+        </div>
+    </div>
+
+</body>
+</html>
